@@ -1,6 +1,7 @@
 import io
 import calendar
 from datetime import datetime, date
+from zoneinfo import ZoneInfo
 import hashlib
 from typing import List, Any
 from reportlab.lib.pagesizes import A4
@@ -150,7 +151,7 @@ def generate_spanish_timesheet_pdf(
     for r in clock_records:
         if r.clock_in:
             # Convert to local timezone date
-            local_date = r.clock_in.astimezone().date()
+            local_date = r.clock_in.astimezone(ZoneInfo("Europe/Madrid")).date()
             if local_date.year == year and local_date.month == month:
                 records_by_day[local_date.day] = r
                 
@@ -165,8 +166,8 @@ def generate_spanish_timesheet_pdf(
         day_label = f"{day} ({day_name})"
         
         if r:
-            in_local = r.clock_in.astimezone() if r.clock_in else None
-            out_local = r.clock_out.astimezone() if r.clock_out else None
+            in_local = r.clock_in.astimezone(ZoneInfo("Europe/Madrid")) if r.clock_in else None
+            out_local = r.clock_out.astimezone(ZoneInfo("Europe/Madrid")) if r.clock_out else None
             
             in_time_str = in_local.strftime("%H:%M:%S") if in_local else "-"
             in_method = r.clock_in_method or "WEB"

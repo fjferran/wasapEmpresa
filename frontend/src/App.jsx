@@ -751,7 +751,7 @@ export default function App() {
   const formatDateTime = (isoStr) => {
     if (!isoStr) return '-';
     const d = new Date(isoStr);
-    return d.toLocaleString('es-ES', { timeZone: 'UTC' }) + ' (UTC)';
+    return d.toLocaleString('es-ES', { timeZone: 'Europe/Madrid' });
   };
 
   const getStatusBadgeClass = (statusStr) => {
@@ -1435,7 +1435,7 @@ export default function App() {
                       <thead>
                         <tr>
                           <th>Empleado</th>
-                          <th>Entrada (UTC)</th>
+                          <th>Entrada</th>
                           <th>Canal</th>
                         </tr>
                       </thead>
@@ -1943,8 +1943,8 @@ export default function App() {
                     <thead>
                       <tr>
                         <th>Empleado</th>
-                        <th>Entrada (UTC)</th>
-                        <th>Salida (UTC)</th>
+                        <th>Entrada</th>
+                        <th>Salida</th>
                         <th>Localización (GPS)</th>
                         <th>Vía Entrada</th>
                         <th>Vía Salida</th>
@@ -2943,13 +2943,18 @@ function InspectorPortal({ token, onExit }) {
 
   const handleExportCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Empleado,NIF/NIE,NSS,Fecha Entrada (UTC),Fecha Salida (UTC),Metodo Entrada,Hash Registro\n";
+    csvContent += "Empleado,NIF/NIE,NSS,Fecha Entrada,Fecha Salida,Metodo Entrada,Hash Registro\n";
     
+    const formatLocal = (isoStr) => {
+      if (!isoStr) return "";
+      return new Date(isoStr).toLocaleString('es-ES', { timeZone: 'Europe/Madrid' });
+    };
+
     records.forEach(r => {
       const empName = r.employee_name || "Empleado Anonimizado";
       const nif = r.nif_nie || "-";
       const nss = r.nss || "-";
-      const line = `"${empName}","${nif}","${nss}","${r.clock_in}","${r.clock_out || ''}","${r.clock_in_method}","${r.record_hash || ''}"`;
+      const line = `"${empName}","${nif}","${nss}","${formatLocal(r.clock_in)}","${formatLocal(r.clock_out)}","${r.clock_in_method}","${r.record_hash || ''}"`;
       csvContent += line + "\n";
     });
     

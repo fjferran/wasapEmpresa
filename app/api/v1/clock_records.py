@@ -1,6 +1,7 @@
 import csv
 import io
 from datetime import date, datetime
+from zoneinfo import ZoneInfo
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
@@ -209,12 +210,12 @@ def export_clock_records_csv(
         email = emp.email if emp else ""
 
         # Entry local timezone extraction
-        in_local = r.clock_in.astimezone() if r.clock_in else None
+        in_local = r.clock_in.astimezone(ZoneInfo("Europe/Madrid")) if r.clock_in else None
         in_date_str = in_local.strftime("%Y-%m-%d") if in_local else ""
         in_time_str = in_local.strftime("%H:%M:%S") if in_local else ""
 
         # Exit local timezone extraction
-        out_local = r.clock_out.astimezone() if r.clock_out else None
+        out_local = r.clock_out.astimezone(ZoneInfo("Europe/Madrid")) if r.clock_out else None
         out_date_str = out_local.strftime("%Y-%m-%d") if out_local else ""
         out_time_str = out_local.strftime("%H:%M:%S") if out_local else ""
 

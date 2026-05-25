@@ -1,5 +1,6 @@
 import re
 from datetime import date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 from sqlalchemy.orm import Session
 from app.models.employee import Employee
 from app.models.clock_record import ClockRecord
@@ -186,8 +187,8 @@ def process_whatsapp_message(
         ).first()
 
         if active_record:
-            local_time_str = active_record.clock_in.astimezone().strftime("%H:%M")
-            local_date_str = active_record.clock_in.astimezone().strftime("%d/%m/%Y")
+            local_time_str = active_record.clock_in.astimezone(ZoneInfo("Europe/Madrid")).strftime("%H:%M")
+            local_date_str = active_record.clock_in.astimezone(ZoneInfo("Europe/Madrid")).strftime("%d/%m/%Y")
             reply_text = f"⚠️ Ya tienes un fichaje de entrada activo registrado a las {local_time_str} del {local_date_str}. Debes fichar *SALIDA* antes de iniciar uno nuevo."
         else:
             now_utc = datetime.now(timezone.utc)
@@ -224,7 +225,7 @@ def process_whatsapp_message(
                 user_id=None # Done by system via WhatsApp
             )
 
-            local_now_str = now_utc.astimezone().strftime("%H:%M:%S")
+            local_now_str = now_utc.astimezone(ZoneInfo("Europe/Madrid")).strftime("%H:%M:%S")
             loc_msg = " con geolocalización" if latitude is not None else ""
             reply_text = f"✅ *ENTRADA* registrada correctamente a las {local_now_str}{loc_msg}."
 
@@ -288,7 +289,7 @@ def process_whatsapp_message(
             minutes, _ = divmod(remainder, 60)
             duration_str = f"{int(hours)}h {int(minutes)}m"
 
-            local_now_str = now_utc.astimezone().strftime("%H:%M:%S")
+            local_now_str = now_utc.astimezone(ZoneInfo("Europe/Madrid")).strftime("%H:%M:%S")
             loc_msg = " con geolocalización" if latitude is not None else ""
             reply_text = f"🏁 *SALIDA* registrada correctamente a las {local_now_str}{loc_msg}. Jornada total: {duration_str}."
 

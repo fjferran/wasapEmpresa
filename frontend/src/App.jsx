@@ -182,38 +182,44 @@ export default function App() {
   const fetchDashboardData = async () => {
     try {
       const headers = { 'Authorization': `Bearer ${token}` };
-      
+
+      const apiFetch = async (url, opts = {}) => {
+        const res = await fetch(url, { ...opts, headers: { ...headers, ...(opts.headers || {}) } });
+        if (res.status === 401) { handleLogout(); return null; }
+        return res;
+      };
+
       if (activeTab === 'dashboard' || activeTab === 'employees' || activeTab === 'work-orders') {
-        const empRes = await fetch(`${API_BASE}/employees/`, { headers });
-        if (empRes.ok) setEmployees(await empRes.json());
+        const empRes = await apiFetch(`${API_BASE}/employees/`);
+        if (empRes?.ok) setEmployees(await empRes.json());
       }
       if (activeTab === 'dashboard' || activeTab === 'shifts') {
-        const shiftRes = await fetch(`${API_BASE}/shifts/`, { headers });
-        if (shiftRes.ok) setShifts(await shiftRes.json());
+        const shiftRes = await apiFetch(`${API_BASE}/shifts/`);
+        if (shiftRes?.ok) setShifts(await shiftRes.json());
       }
       if (activeTab === 'dashboard' || activeTab === 'clocks' || activeTab === 'work-orders') {
-        const clockRes = await fetch(`${API_BASE}/clock-records/`, { headers });
-        if (clockRes.ok) setClockRecords(await clockRes.json());
+        const clockRes = await apiFetch(`${API_BASE}/clock-records/`);
+        if (clockRes?.ok) setClockRecords(await clockRes.json());
       }
       if (activeTab === 'dashboard' || activeTab === 'requests') {
-        const reqRes = await fetch(`${API_BASE}/requests/`, { headers });
-        if (reqRes.ok) setRequests(await reqRes.json());
+        const reqRes = await apiFetch(`${API_BASE}/requests/`);
+        if (reqRes?.ok) setRequests(await reqRes.json());
       }
       if (activeTab === 'dashboard' || activeTab === 'work-orders') {
-        const orderRes = await fetch(`${API_BASE}/work-orders/`, { headers });
-        if (orderRes.ok) setWorkOrders(await orderRes.json());
+        const orderRes = await apiFetch(`${API_BASE}/work-orders/`);
+        if (orderRes?.ok) setWorkOrders(await orderRes.json());
       }
       if (activeTab === 'logs') {
-        const auditRes = await fetch(`${API_BASE}/audit-logs/`, { headers });
-        if (auditRes.ok) setAuditLogs(await auditRes.json());
+        const auditRes = await apiFetch(`${API_BASE}/audit-logs/`);
+        if (auditRes?.ok) setAuditLogs(await auditRes.json());
 
         // WhatsApp logs
-        const waRes = await fetch(`${API_BASE}/clock-records/whatsapp-logs`, { headers });
-        if (waRes.ok) setWhatsappLogs(await waRes.json());
+        const waRes = await apiFetch(`${API_BASE}/whatsapp/logs`);
+        if (waRes?.ok) setWhatsappLogs(await waRes.json());
 
         // Inspection tokens
-        const tokensRes = await fetch(`${API_BASE}/inspection/tokens`, { headers });
-        if (tokensRes.ok) setInspectionTokens(await tokensRes.json());
+        const tokensRes = await apiFetch(`${API_BASE}/inspection/tokens`);
+        if (tokensRes?.ok) setInspectionTokens(await tokensRes.json());
       }
     } catch (err) {
       console.error("Error loading dashboard data", err);

@@ -1,10 +1,37 @@
-from typing import Optional
+from typing import Optional, List
 from fastapi import APIRouter, Depends, Form, Response
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from datetime import datetime
 from app.core.database import get_db
+from app.api.deps import get_current_active_manager
+from app.models.employee import Employee
+from app.models.whatsapp_log import WhatsAppLog
 from app.services.whatsapp_service import process_whatsapp_message
 
 router = APIRouter()
+
+class WhatsAppLogResponse(BaseModel):
+    id: str
+    phone_number: str
+    message_body: str
+    direction: str
+    twilio_message_sid: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+@router.get("/logs", response_model=List[WhatsAppLogResponse])
+def list_whatsapp_logs(
+    limit: int = 200,
+    current_user: Employee = Depends(get_current_active_manager),
+    db: Session = Depends(get_db)
+):
+    logs = db.query(WhatsAppLog).filter(
+        WhatsAppLog.company_id == current_user.company_id
+    ).order_by(WhatsAppLog.created_at.desc()).limit(limit).all()
+    return logs
 
 @router.post("/webhook")
 def whatsapp_webhook(

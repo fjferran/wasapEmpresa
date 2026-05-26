@@ -26,7 +26,9 @@ import {
   Map
 } from 'lucide-react';
 
-const API_BASE = "http://localhost:8000/api/v1";
+const API_BASE = window.location.origin.includes("localhost")
+  ? "http://localhost:8000/api/v1"
+  : (window.location.origin + "/app2/api/v1");
 
 export default function App() {
   // Auth state
@@ -2394,14 +2396,15 @@ export default function App() {
                       </thead>
                       <tbody>
                         {inspectionTokens.map((t) => {
-                          const isExpired = new Date(t.expires_at) < new Date() || !t.is_active;
+                          const isExpired = new Date(t.expires_at) < new Date() || t.is_revoked;
+                          const durationHours = Math.round((new Date(t.expires_at) - new Date(t.created_at)) / 3600000) || 1;
                           return (
                             <tr key={t.id}>
-                              <td>{t.duration_hours}h</td>
+                              <td>{durationHours}h</td>
                               <td>{new Date(t.expires_at).toLocaleString()}</td>
                               <td>
                                 <span className={`badge ${isExpired ? 'badge-danger' : 'badge-success'}`}>
-                                  {isExpired ? 'Expirado' : 'Activo'}
+                                  {isExpired ? (t.is_revoked ? 'Revocado' : 'Expirado') : 'Activo'}
                                 </span>
                               </td>
                               <td style={{ textAlign: 'right' }}>
@@ -2415,7 +2418,7 @@ export default function App() {
                                       Copiar Link
                                     </button>
                                   )}
-                                  {t.is_active && (
+                                  {!t.is_revoked && (
                                     <button
                                       onClick={() => handleRevokeInspectionToken(t.id)}
                                       className="btn-danger"

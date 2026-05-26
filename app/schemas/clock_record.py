@@ -37,6 +37,7 @@ class ClockRecordResponse(ClockRecordBase):
     id: str
     company_id: str
     record_hash: Optional[str] = None
+    signature_verified: bool = False
     created_at: datetime
     updated_at: datetime
 

@@ -11,7 +11,8 @@ if settings.DATABASE_URL.startswith("sqlite"):
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    root_path="/app2"
 )
 
 # CORS Middleware setup (useful for future web dashboards)

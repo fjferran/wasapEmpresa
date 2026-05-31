@@ -338,6 +338,7 @@ export default function App() {
     setActionSuccess('');
     try {
       const daysStr = daysArrayToString(newEmpDefaultDays);
+      const cleanPhone = newEmpPhone.replace(/\s+/g, '');
       const res = await fetch(`${API_BASE}/employees/`, {
         method: 'POST',
         headers: {
@@ -347,7 +348,7 @@ export default function App() {
         body: JSON.stringify({
           first_name: newEmpFirst,
           last_name: newEmpLast,
-          phone_number: newEmpPhone,
+          phone_number: cleanPhone,
           email: newEmpEmail,
           password: newEmpPass,
           role: newEmpRole,
@@ -361,7 +362,13 @@ export default function App() {
 
       if (!res.ok) {
         const errData = await res.json();
-        throw new Error(errData.detail || 'No se pudo crear el empleado');
+        let errMsg = 'No se pudo crear el empleado';
+        if (typeof errData.detail === 'string') {
+          errMsg = errData.detail;
+        } else if (Array.isArray(errData.detail)) {
+          errMsg = errData.detail.map(e => e.msg).join(', ');
+        }
+        throw new Error(errMsg);
       }
 
       setActionSuccess('Empleado registrado correctamente.');
@@ -388,6 +395,7 @@ export default function App() {
     setActionSuccess('');
     try {
       const daysStr = daysArrayToString(editEmpDefaultDays);
+      const cleanPhone = editEmpPhone.replace(/\s+/g, '');
       const res = await fetch(`${API_BASE}/employees/${editingEmployee.id}`, {
         method: 'PUT',
         headers: {
@@ -397,7 +405,7 @@ export default function App() {
         body: JSON.stringify({
           first_name: editEmpFirst,
           last_name: editEmpLast,
-          phone_number: editEmpPhone,
+          phone_number: cleanPhone,
           email: editEmpEmail,
           role: editEmpRole,
           is_active: editEmpIsActive,
@@ -411,7 +419,13 @@ export default function App() {
 
       if (!res.ok) {
         const errData = await res.json();
-        throw new Error(errData.detail || 'No se pudo actualizar el empleado');
+        let errMsg = 'No se pudo actualizar el empleado';
+        if (typeof errData.detail === 'string') {
+          errMsg = errData.detail;
+        } else if (Array.isArray(errData.detail)) {
+          errMsg = errData.detail.map(e => e.msg).join(', ');
+        }
+        throw new Error(errMsg);
       }
 
       setActionSuccess('Empleado actualizado correctamente.');
